@@ -1,0 +1,15 @@
+dataset/
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+build/
+*.egg-info/
+node_modules/
+*.tgz
+
+# challenge-derived data (not redistributed)
+dataset/
+output.csv
+code/ghost/ocr_cache/
+docs/trace/

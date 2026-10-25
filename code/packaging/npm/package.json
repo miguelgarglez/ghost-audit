@@ -1,0 +1,14 @@
+{
+  "name": "ghost-audit-mcp",
+  "version": "1.0.1",
+  "description": "Ghost Audit: deterministic, evidence-backed audit of 'completed' data-deletion requests. Read-only MCP server + CLI (bundled Python, needs python3 >= 3.9).",
+  "license": "MIT",
+  "author": "Miguel García González",
+  "homepage": "https://github.com/miguelgarglez/ghost-audit#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/miguelgarglez/ghost-audit.git" },
+  "bugs": { "url": "https://github.com/miguelgarglez/ghost-audit/issues" },
+  "keywords": ["mcp", "model-context-protocol", "mcp-server", "gdpr", "data-deletion", "privacy", "audit"],
+  "bin": { "ghost-audit-mcp": "bin/ghost-audit-mcp.js", "ghost-audit": "bin/ghost-audit.js" },
+  "files": ["bin", "py", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" }
+}

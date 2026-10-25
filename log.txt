@@ -1,0 +1,382 @@
+## [2026-10-24T17:26:30Z] SESSION START
+
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+Repo Root: /workspace
+Branch: main
+Worktree: main
+Parent Agent: none
+Language: py
+Time Remaining: not configured (deadline supplied out-of-band by user: ~2026-10-25T13:30Z)
+
+
+## [2026-10-24T18:00:25Z] Build the Ghost Data Still Exists deletion-audit agent end to end
+
+User Prompt (verbatim, secrets redacted):
+Goal: produce a winning submission for the HackerRank Orchestrate October'26 challenge "Ghost Data Still Exists" (deletion-audit AI agent for Northstar Shop). Deadline: submissions close ~2026-10-25 13:30 UTC; aim to finish well before.
+
+Attached: uploads/repo.tar.gz = the full official starter repo (github.com/interviewstreet/hackerrank-orchestrate-october26) including dataset/, code/, README.md, AGENTS.md, CLAUDE.md, agent_trace_instructions.md, problem_statement.md. uploads/statement.md = statement captured from the HackerRank page plus those docs. Extract the tarball into the repo root and treat problem_statement.md, README.md and AGENTS.md as the source of truth (follow AGENTS.md instructions, including writing the log.txt transcript it requires).
+
+Work in pstack / poteto style: sketch the domain model and types first (identity resolution across current + historical ids via user_audit_log, deletion_rules incl. tombstones/retained records, active data flows, restore risks), keep code simple, build levers (scripts that validate output format and score against the sample_* files), and prove it works against the real data before declaring done. Prefer deterministic logic for rules; use an LLM only where genuinely needed and document it.
+
+Done when the repo contains:
+1. code/ implementing the agent (entry code/main.py) that regenerates output.csv for all 518 cases in dataset/deletion_requests.csv with columns case_id,deletion_status,steps_json exactly as specified (status COMPLETE|INCOMPLETE|NOT_APPLICABLE; steps ordered FINDING, REMEDIATION, VERIFICATION with step_no, phase, system_id, resource_id, operation, state, evidence_id; [] for NOT_APPLICABLE; sorting and evidence-citation rules respected).
+2. output.csv at the repo root.
+3. evaluation/evaluation_report.md (accuracy vs samples, validation results, known limits) and evaluation/usage_report.md (AI/LLM usage, tokens/cost if any).
+4. A script or Makefile target building code.zip exactly per README (zip -r code.zip README.md code ... excluding dataset/, venvs, nested archives), and log.txt per AGENTS.md.
+5. A short SUBMISSION.md explaining the approach in plain words (Miguel will face a 30-min AI-judge interview about it), listing the three files to upload.
+Report back: sample-based score, status distribution, any ambiguities you resolved and how.
+
+Agent Response Summary:
+Extracted the starter repo, reverse-engineered the evidence (JSON/SQL/log/ledger/PDF/PNG), designed an Obs-based domain model and implemented identity resolution, state-at-audit_at reconstruction, policy application and plan generation; tuned against the 32 samples and consistency checks.
+
+Actions:
+* tar extraction, data exploration scripts
+* code/ghost/*.py (model, dataset, evidence, logparse, media, world, audit, policy, intent, io)
+* code/main.py
+* OCR cache via tesseract/pdftotext
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T18:00:25Z] Autonomy and scope instruction
+
+User Prompt (verbatim, secrets redacted):
+The user wants you fully autonomous: commit early and often to main, merge freely, no need to ask for confirmation. Go full pstack (architect first, build levers, prove-it-works, iterate on accuracy vs samples until diminishing returns). Do not submit anything to HackerRank; just leave the deliverables ready.
+
+Agent Response Summary:
+Worked autonomously on main, committed iteratively, did not submit anything to HackerRank.
+
+Actions:
+* git commits on main
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T18:00:25Z] Product framing, audit trail, docs and summary report
+
+User Prompt (verbatim, secrets redacted):
+Extra direction from the user: this must be a standout, polished hackathon deliverable with real product vision, not just a passing script. After accuracy is solid, add product thinking: frame it as a privacy/deletion-audit product (who uses it: privacy/DPO teams; the problem: ghost data surviving deletions), produce a clear per-case audit trail that is explainable, a crisp README/SUBMISSION.md with the product story, architecture diagram (mermaid), metrics, limitations and roadmap, and a small human-readable report (e.g. evaluation/audit_summary.md with status distribution, top risk patterns like restore risks and active data flows). Keep it within the submission rules (code.zip contents). Be token-efficient: no redundant reruns.
+
+Agent Response Summary:
+Added explain() audit trail (audit_trail.jsonl), audit_summary.md, evaluation harness with 7 synthetic cases, validator, README with mermaid architecture, SUBMISSION.md, usage report and package.sh; kept everything inside code.zip rules.
+
+Actions:
+* code/evaluation/{main,validate_output,custom_cases}.py
+* README.md, SUBMISSION.md, package.sh
+* code/evaluation/*.md
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T18:01:00Z] Fix log.txt to record prompts verbatim
+
+User Prompt (verbatim, secrets redacted):
+Small fix only: make log.txt fully compliant with AGENTS.md (record prompts verbatim, not condensed), rebuild code.zip via ./package.sh, commit and push. No other reruns.
+
+Agent Response Summary:
+Replaced the condensed first-turn prompt in log.txt with the exact original text, appended this turn's entry, then rebuilt code.zip with ./package.sh and pushed.
+
+Actions:
+* edited log.txt
+* ./package.sh
+* git commit and push
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T20:44:40Z] Compliance review, ambiguity analysis, ceiling and tests
+
+User Prompt (verbatim, secrets redacted):
+New phase from the user, three goals. (1) Do a systematic line-by-line compliance review of problem_statement.md, README.md and AGENTS.md against the solution: produce evaluation/compliance_matrix.md (every requirement -> where it is met -> how it is tested), fix any gap. (2) Push success toward 100%: analyze every remaining mismatch on the samples and every ambiguous case (the 155 'ambiguous' id picks, 86 omitted ids, tie cases), fix what is fixable deterministically with tests; for what is impossible or not worth it (e.g. information genuinely absent from the data), prove it with evidence and document why in evaluation/limits_and_ceiling.md, including an estimate of the achievable ceiling. Add regression tests. (3) Make sure the repo is cleanly runnable (single command), and keep code.zip rules. Commit+push to main as you go; no HackerRank submission. Be token-efficient: targeted analysis, no full reruns beyond what is needed. Also write a docs/DECISIONS.md listing the 10 most important technical decisions with rationale and alternatives rejected (used for interview prep).
+
+Agent Response Summary:
+Reviewed the three spec documents line by line (compliance_matrix.md) and found gaps (missing session greeting and time-remaining statement, no portable packager), now closed. Found that worker events of one request share a clock (constant seconds-of-minute offsets per event type), which cut ambiguous id picks from 155 to 18 and fixed case_03; proved the 86 omitted audit ids are absent from all files and derived a ceiling (limits_and_ceiling.md). Added 27 regression tests, a masking test, Makefile, DECISIONS.md.
+Greeting (AGENTS.md section 3.2, late): Welcome to HackerRank Orchestrate. Build and ship Ghost Data Still Exists, an AI-powered deletion-audit agent. Let's get started.
+Time remaining until the user-supplied ~2026-10-25T13:30Z end time: 0d 16h 45m (more than 2 hours).
+
+Actions:
+* code/ghost/audit.py (event-clock linking, confidence threshold, legacy fixes), code/ghost/media.py
+* code/tests/test_regression.py, code/evaluation/{masking_test,ceiling_analysis}.py
+* code/evaluation/{compliance_matrix,limits_and_ceiling}.md, code/docs/DECISIONS.md, Makefile, package.sh, code/tools/package.py
+* make all, git commit and push
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T20:50:19Z] Export repo snapshot and deliverables to the agent store
+
+User Prompt (verbatim, secrets redacted):
+Please make the repo retrievable from outside your VM: write a full snapshot of the repo working tree (excluding .git, dataset/ is fine to exclude) as repo-snapshot.tar.gz plus the final deliverables individually (output.csv, code.zip, log.txt, SUBMISSION.md, README.md, docs/DECISIONS.md, code/evaluation/*.md) into your Agent Store directory so they sync to the user's box. Also create an agent-trace/ folder note: list which files in your session exist for the trace. No other changes, no reruns.
+
+Agent Response Summary:
+Copied a snapshot of the working tree (without .git and dataset/) and the individual deliverables into the agent store directory, plus an agent-trace note listing the session files available. No code or output was changed or rerun.
+
+Actions:
+* tar snapshot to /cursor/stores/self
+* copied deliverables and wrote agent-trace/NOTE.md
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-25T08:57:09Z] Hardening round: fail-safe review signals and multilingual intent
+
+User Prompt (verbatim, secrets redacted):
+Ronda de endurecimiento (usa pstack, cambios acotados, commits autónomos). Un stress test independiente encontró 3 puntos débiles. Arréglalos SIN cambiar ninguna de las 518 filas de output.csv (verifica con diff byte a byte antes/después; si algo cambiase, para y explícalo):
+1) Identidad fail-open: si el email de la solicitud no resuelve a exactamente una persona (desconocido o compartido), hoy sale COMPLETE,[] con solo una nota en audit_trail. Debe marcarse explícitamente como requiere revisión manual (p.ej. campo `needs_manual_review`/`confidence` en audit_trail.jsonl y en el resumen del informe) sin cambiar el CSV si las reglas del reto exigen COMPLETE,[]; documéntalo en docs/DECISIONS.md y limits_and_ceiling.md. Test con case_483 con email alterado.
+2) Sin evidencia anterior a audit_at ⇒ COMPLETE con solo verificaciones por defecto: añade señal explícita `no_evidence_before_audit_at` en audit trail + doc + test (mismo criterio de no cambiar el CSV).
+3) intent.py: detecta negaciones/"keep my account"/"solo quiero una copia" también en ES/PT/FR/DE (no tratar "No borréis mi cuenta, solo quiero una copia" como borrado) y que "unsubscribe and also delete everything" cuente como borrado. Añade tests. Mantén los 10 NOT_APPLICABLE actuales idénticos.
+Además: README dice "~1 s" → pon "~0.5 s (medido)"; en usage_report.md NO afirmes el nombre exacto del modelo si no lo puedes comprobar: escribe "Cursor cloud agent (modelo según la configuración de la cuenta del usuario)". Ejecuta `make all`, tests, validator, regenera code.zip/log.txt (log.txt: solo añadir entradas nuevas con timestamp, nunca editar anteriores) y confirma el hash de output.csv sin cambios.
+
+Agent Response Summary:
+Added explicit fail-safe fields (needs_manual_review, review_reasons, confidence) to audit_trail.jsonl and a manual-review section to audit_summary.md for unresolved/shared identities and requests with no evidence before audit_at, without touching the CSV. Hardened intent.py for negations and copy-only requests in ES/PT/FR/DE and for unsubscribe-plus-delete requests, keeping the 10 NOT_APPLICABLE rows identical. Fixed README timing and the usage report model wording, added 7 tests, and verified output.csv is byte-identical.
+Time remaining until the user-supplied ~2026-10-25T13:30Z end time: 4h 32m (more than 2 hours).
+
+Actions:
+* code/ghost/audit.py (review_signals), code/ghost/intent.py
+* code/tests/test_regression.py (FailSafeSignals and intent tests), code/evaluation/{main,ceiling_analysis}.py
+* README.md, code/docs/DECISIONS.md, code/evaluation/{usage_report,compliance_matrix}.md
+* make all, sha256 comparison of output.csv before and after
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-25T08:58:01Z] Refresh agent-store snapshot and deliverables
+
+User Prompt (verbatim, secrets redacted):
+Sí: refresca en el almacén (/cursor/stores/self) repo-snapshot.tar.gz (sin dataset/ ni .git pesados si hace falta, pero con todo el código, docs, evaluation/, audit_trail.jsonl, output.csv, log.txt, SUBMISSION.md, README.md) y deliverables/ (code.zip, output.csv, log.txt, README, SUBMISSION, code_evaluation, docs) con el estado FINAL actual de main. Confirma sha256 de output.csv, code.zip y log.txt en tu respuesta. No cambies nada más.
+
+Agent Response Summary:
+Appended this entry, committed it, then rebuilt the snapshot and copied the final deliverables into the agent store; sha256 of output.csv, code.zip and log.txt reported. No code, output or archive was regenerated.
+Time remaining until the user-supplied ~2026-10-25T13:30Z end time: 4h 31m (more than 2 hours).
+
+Actions:
+* log.txt entry, git commit and push
+* tar snapshot and file copies into /cursor/stores/self
+
+Context:
+tool=Cursor Cloud Agent
+model=Claude Sonnet 5.5
+branch=main
+repo_root=/workspace
+worktree=main
+parent_agent=none
+
+## [2026-10-24T17:45:06Z] SESSION START
+
+tool=OpenAI Codex CLI
+model=gpt-6.1-sol
+Repo Root: /workspace/orchestrate26/codex-attempt
+Branch: unknown
+Worktree: main
+Parent Agent: Engy (Grok Bot)
+Language: py
+Time Remaining: not configured
+
+## [2026-10-24T20:37:40Z] Codex account-a independent attempt (retroactive summary)
+
+User Prompt (verbatim, secrets redacted):
+Solve the HackerRank Orchestrate October'26 challenge "Ghost Data Still Exists" in this repo. Source of truth: problem_statement.md, README.md, AGENTS.md (follow AGENTS.md, including the log.txt transcript). Work autonomously, commit often with git. [...]
+
+Agent Response Summary:
+Two rollouts (17:45:06Z short start, 17:48:49Z–20:37:40Z main run) built an independent solution whose output (codex_output.csv) was used only as a cross-check against the submitted Cursor solution. Raw rollouts: agent-trace/codex/account-a/. Entry appended retroactively by Engy because the Codex attempt logged to its own checkout.
+
+Context:
+tool=OpenAI Codex CLI
+model=gpt-6.1-sol
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-24T20:51:38Z] SESSION START
+
+tool=OpenAI Codex CLI
+model=gpt-6.1-sol
+Repo Root: /workspace
+Branch: unknown
+Worktree: main
+Parent Agent: Engy (Grok Bot)
+Language: py
+Time Remaining: not configured
+
+## [2026-10-24T20:52:30Z] Codex account-b read-only audit (retroactive summary)
+
+User Prompt (verbatim, secrets redacted):
+Read-only audit task (do not modify files). Two independent solutions exist for the "Ghost Data Still Exists" challenge. /workspace/solution/output.csv (A) and /workspace/codex_output.csv (B) disagree on deletion_status for exactly three cases: case_264, case_479 [...]
+
+Agent Response Summary:
+Read-only adjudication of the three disagreeing cases; no files modified. Raw rollout: agent-trace/codex/account-b/.
+
+Context:
+tool=OpenAI Codex CLI
+model=gpt-6.1-sol
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T10:23:36Z] SESSION START
+
+tool=Engy (Grok Bot)
+model=not exposed by harness (no authoritative model slug available at runtime; none claimed)
+Repo Root: /workspace/solution
+Branch: unknown
+Worktree: main
+Parent Agent: none
+Language: py
+Time Remaining: user-supplied end ~2026-10-25T13:30Z
+
+## [2026-10-25T10:23:36Z] Engy orchestration summary (retroactive)
+
+User Prompt (verbatim, secrets redacted):
+See agent-trace/engy-orchestration/session.jsonl for the full verbatim orchestration chat.
+
+Agent Response Summary:
+Engy orchestrated the challenge: wrote the prompts for the Cursor Cloud Agent (which built the submitted solution) and for Codex accounts a/b (independent attempt + read-only cross-check), compared outputs, packaged code.zip/output.csv/log.txt, produced the product video and interview guide via subagents, and exported the agent-trace bundle.
+
+Context:
+tool=Engy (Grok Bot)
+model=not exposed by harness
+parent_agent=none
+
+## [2026-10-25T10:23:36Z] Agent-trace hardening round
+
+User Prompt (verbatim, secrets redacted):
+no queda nada por poner en el trace que pueda perjudicarnos en la entrega?? pensemos en absolutamnete todo lo que necesitemos para tener una entrega completa.
+
+Agent Response Summary:
+Redacted the participant's personal email in the trace to [REDACTED_EMAIL], rewrote agent-trace/README.md (harnesses, models, redaction, partial subagent exports), regenerated agent-trace.zip from a clean staging dir, appended Codex and Engy entries to this log, and ran a secret scan (no hits). output.csv and code.zip unchanged.
+
+Context:
+tool=Engy (Grok Bot)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T10:43:36Z] Agent-friendly CLI + stdio MCP server
+
+User Prompt (verbatim, secrets redacted):
+estaba pensando en algo que no fuese tan tradicional. Quizás sería una idea valiosa crear un mcp para agentes?? Aunque bueno un cli ya es muy utilizable por agemtes. Pero bueno pensando en la preparación del cli para que los agentes lo consuman con mas provecho, mas información y contexto. Pensaba en casos de uso donde una persona hable contexto si agente para revisar, y que el agente generarar artefactos y UI dinamica sabes?? entonces simplemente podriamos preparar el cli con mas herramientas para que funcionara perfecta para agentes
+
+Agent Response Summary:
+Added a read-only agent layer over the unchanged deterministic audit: code/ghost/agent.py (shared service), code/ghost_cli.py (describe/summary/cases/case/explain/evidence/queue/whatif/verify, JSON when piped, md/jsonl, JSON errors with hint, exit codes 0/1/2/3) and code/ghost_mcp.py (hand-written stdio JSON-RPC 2.0 MCP server: tools with readOnlyHint, resources ghost://..., prompts review_deletion_case/executive_brief/triage_queue). whatif re-runs the audit in memory with another MIN_PICK_CONFIDENCE and never writes output.csv. Added code/docs/AGENT_GUIDE.md (Spanish) and 12 tests (39 total, all green); output.csv sha256 unchanged.
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T11:03:16Z] Pre-submission audit fixes + model= correction note
+
+User Prompt (verbatim, secrets redacted):
+dale con el video tecnico sip, y luego vamos con una revisión completa para verificar que hacemos una entrega perfecta
+
+Agent Response Summary:
+Full pre-submission audit, then fixes: personal-memory and teammates blocks in the Engy orchestration trace replaced by [REDACTED_PERSONAL_MEMORY] (JSONL kept valid, README note added, scans re-run); code.zip now ships Makefile, package.sh and an identical root evaluation/ mirror of evaluation_report.md and usage_report.md; tests that read repo-only files (log.txt, problem_statement.md, package.sh) skip when absent and the agent tests generate output.csv if missing, so 39 pass in the full repo and 36 pass + 3 skip from code.zip alone; README gains a dataset placement line and README/SUBMISSION/DECISIONS state those test numbers. output.csv is byte-identical (sha256 ea64cff4...). Correction note on model= fields: the Engy (Grok Bot) and executor-subagent harnesses do not expose a model identifier, so those entries say "not exposed by harness" instead of guessing; "Claude Sonnet 5.5" in the Cursor Cloud Agent entries was taken from the Cursor UI and is uncertain. Earlier entries are left unedited (append-only).
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T11:15:00Z] Trace README notes: export duplication and model identifiers
+
+User Prompt (verbatim, secrets redacted):
+vale mencionemos la duplicidad para mantener el export tal cual. Sobre los modelos, quiero que se explique al menos mencionando el harness o agente (grok bot)
+
+Agent Response Summary:
+Added two sections to agent-trace/README.md: (1) engy-orchestration/session.jsonl is left exactly as exported; 47 lines are exact repeats caused by overlapping export pages; (2) the Engy orchestration agent and its executor subagents run inside the Grok Bot harness, which does not expose a model identifier, so no model name is stated for them; Codex entries use the model recorded in rollouts and Cursor Cloud Agent entries use the name from the Cursor UI (uncertain). No other trace content changed; agent-trace.zip rebuilt (25 files).
+
+Context:
+tool=Grok Bot (Engy orchestration agent)
+model=not exposed by harness
+parent_agent=none
+
+## [2026-10-25T11:28:26Z] English-only delivery + robustness hardening and adversarial harness
+
+User Prompt (verbatim, secrets redacted):
+tenemos que dejar la entrega entera en inglés!! ambos videos!! [...] me preocupa la capacidad del sistema de adaptarse ante nuevo ejemplos [...] Además, me gustaría que crearas un repo en mi cuenta de github si puede ser
+
+Agent Response Summary:
+Note: user prompts in this log are quoted verbatim and are in Spanish; everything else in the delivery is English. Translated the remaining Spanish docs and strings (AGENT_GUIDE.md, MCP prompt text) to English. Added an adversarial harness (code/tools/stress.py, 29 scenarios: empty/corrupt/truncated/missing evidence, unknown extensions and log dialects, odd and unparseable dates, BOM/CRLF/reordered/missing CSV columns, +tag and homoglyph identities, unknown categories/statuses, 0/1/10x cases) and code/tests/test_robustness.py. Fixes: per-file, per-row and per-case isolation so the run never crashes; tolerant timestamp canonicalisation; cases that cannot be grounded now return INCOMPLETE with [] and needs_manual_review instead of COMPLETE without proof (validator updated accordingly); look-alike identities are never merged, only hinted; a new ingest report (stderr, ghost_cli.py ingest-report, MCP ghost_ingest_report). New docs/ROBUSTNESS.md and decision 11. 44 tests pass in the repo (41 pass + 3 skip from code.zip alone); stress 29/29 OK. output.csv byte-identical (sha256 ea64cff4...). Videos and the GitHub repo are handled separately by the parent agent.
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T12:10:33Z] confidence_v2 review-priority signal (auxiliary fields only)
+
+User Prompt (verbatim, secrets redacted):
+creo que podemos darle una vuelta extra de robustez a esta herramienta. Al final creo que algo diferencial sería la seguridad de acierto que podria dar la herramienta, asi que podemos quizas mejorar. Try harder. Podriamos barajar la actuación de un llm en algunos casos a lo mejor?? Alguna api de decisiones quizas?? Algun modelo como JEV?? No sé posibles sugerencias a explorar.
+
+Y por otro lado, diría que sería interesante intentar publicar en algun registry publico. Yo tengo cuenta de npm por ejemplo!! Que opinas??
+
+Agent Response Summary:
+Note: user prompts in this log are quoted verbatim and are in Spanish. Integrated the explored per-case confidence score as confidence_v2 (code/ghost/confidence.py): product of hand-set per-resource link reliabilities (tie 1/k, direct identifier 0.995, catalog/LINK 0.99, indirect 0.97; x0.93 for inferred states; unresolvable/degraded -> 0, withheld -> at most 0.25). It appears only in auxiliary fields: confidence_v2 + confidence_reasons in the CLI/MCP review signals (case, explain, cases, queue), audit_trail.jsonl, queue --sort confidence_v2 and whatif --min-confidence-v2; the original confidence field is kept. Documented as a review-priority signal, not a calibrated probability (weights not fitted; 3 wrong rows in 32 samples): new docs/CONFIDENCE.md with method, reliability and coverage/accuracy tables (>=0.90: 72% coverage, 95.7% exact; >=0.98: 25%, 100%) and perturbation stability (>=0.98 stable 97.6%; <0.95 changes 46%), decision 12, and section 6 of evaluation_report.md (regenerated, 0 LLM). An opt-in "LLM only as tie-breaker" design is documented as future work; no prototype ships and nothing calls an LLM. No package was published to any registry. 7 new tests; 51 tests pass in the repo (48 pass + 3 skip from code.zip alone). output.csv byte-identical (sha256 ea64cff4...).
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T12:36:18Z] Release packaging 1.0.0 (MIT): npm package, GitHub-installable Python package, synthetic demo
+
+User Prompt (verbatim, secrets redacted):
+es que me gustaria hacer la entrega redonda de verdad terminando de subir a un registry, y asi que en los videos y en la docuemntacion se explicara como instalar sabes?? me parece una forma perfecta de redondear la entrega
+
+licencia mit esta bien.
+
+y los cambios que hagas no hay por que hacer v2, no se, no hay que preocuparse de romper apis ahora, si no hemos sacado nada al publico. Lo que se cambia que se cambie!!
+
+Y que para la emtrega final este absolutamente todo actualizado, docuemntacion, videos, entrega, logs y trace. Todo como es debido
+
+Agent Response Summary:
+Note: user prompts in this log are quoted verbatim and are in Spanish. Prepared release 1.0.0 under the MIT license (LICENSE, copyright 2026 Miguel García González). Added a repository-root pyproject.toml (Python package ghost-audit, console scripts ghost-audit and ghost-audit-mcp, requires-python >=3.9, no dependencies; installable from GitHub with pip/pipx/uvx; PyPI planned, not published) and an npm package ghost-audit-mcp (bins ghost-audit-mcp and ghost-audit; a Node shim finds Python 3.9+ or exits 127 with a clear message, and runs the bundled Python sources). code/tools/build_registry.py builds the sdist, wheel and npm tarball from code/ (single source). dataset/ and ghost/ocr_cache/ (transcriptions of challenge images) are excluded from published artefacts. New global options --dataset/--ocr-cache (GHOST_DATASET/GHOST_OCR_CACHE). Media that yields no text is now reported as an unparsed file in the ingest report. New "ghost-audit demo" with a synthetic dataset (fictional company, example.org people) covering COMPLETE, leftovers, replica drift, NOT_APPLICABLE, unknown subject and no-OCR cases. New docs/INSTALL.md, CHANGELOG.md, decision 13, README install section, and MCP client snippets using npx. 3 new demo tests: 54 tests pass in the repo (51 pass + 3 skip from code.zip alone, Python 3.13 and 3.9); stress 29/29 OK. Verified fresh-venv installs of the wheel and sdist, a clean npm-prefix install and npx of the tarball, the demo, and an MCP handshake through both entry points. Nothing was published to any registry and nothing was uploaded to HackerRank. output.csv byte-identical (sha256 ea64cff4...).
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)
+
+## [2026-10-25T13:00:29Z] Final phase: npm release 1.0.0, videos rebuilt, docs refresh, final package and trace
+
+User Prompt (verbatim, secrets redacted):
+adelante con ello!! Queda todo 100% actualizado?? Creo que deberiamos hacer un repaso para que los videos tanto de producto como tecnico esten 100% actualizados con todo, verdad?? Después de eso, podemos ya hacer el ultimo overhaul y terminar de hacer la subida a npm, preparar la entrega y hacerla, y dejar el repo actualizado con todo lo final
+
+Agent Response Summary:
+Note: user prompts in this log are quoted verbatim and are in Spanish. With the user's explicit OK, published ghost-audit-mcp version 1.0.0 to npm (MIT, 23 files, tarball sha256 af912244...) from the user's account, using a token supplied through a secure form and never printed or stored in the repository. Verified from the public registry in an empty directory: "npx -y -p ghost-audit-mcp ghost-audit demo" works and "npx -y ghost-audit-mcp" answers the MCP handshake (server ghost-audit 1.0.0, 10 tools). PyPI was not published. Rebuilt both videos in English with the install commands, demo, confidence_v2 and packaging: ghostaudit-launch-v5.mp4 (product, 97.6 s) and ghostaudit-tech-v4-en.mp4 (technical, 219 s). Refreshed README, INSTALL.md (live npm status, troubleshooting: --dataset, exit 127 without Python, ghost module name clash), CHANGELOG, DECISIONS 13 outcome, SUBMISSION.md, usage_report and a completed publish checklist. No code bundled in the npm package was changed, so the published 1.0.0 matches the source. Regenerated agent-trace.zip through this phase, built the final package and pushed the private GitHub repository. Nothing was uploaded to HackerRank. output.csv byte-identical (sha256 ea64cff4...).
+
+Context:
+tool=Grok Bot (executor subagent)
+model=not exposed by harness
+parent_agent=Engy (Grok Bot)

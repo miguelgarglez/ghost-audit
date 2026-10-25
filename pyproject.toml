@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghost-audit"
+version = "1.0.1"
+description = "Deterministic, evidence-backed audit of 'completed' data-deletion requests: CLI + read-only MCP server, standard library only"
+readme = "code/packaging/README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Miguel García González" }]
+keywords = ["gdpr", "data-deletion", "privacy", "audit", "mcp", "model-context-protocol", "agent", "compliance"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/miguelgarglez/ghost-audit"
+Repository = "https://github.com/miguelgarglez/ghost-audit"
+Documentation = "https://github.com/miguelgarglez/ghost-audit/blob/main/docs/INSTALL.md"
+Changelog = "https://github.com/miguelgarglez/ghost-audit/blob/main/CHANGELOG.md"
+
+[project.scripts]
+ghost-audit = "ghost_cli:main"
+ghost-audit-mcp = "ghost_mcp:main"
+
+[tool.setuptools]
+py-modules = ["ghost_cli", "ghost_mcp"]
+packages = ["ghost"]
+include-package-data = false
+package-dir = { "" = "code" }
